@@ -4,6 +4,9 @@ Add-Type -AssemblyName System.Drawing
 # Caminho do log
 $logPath = Join-Path -Path (Split-Path -Parent $MyInvocation.MyCommand.Definition) -ChildPath "log.txt"
 
+# Zera o log ao iniciar o script
+"" | Out-File -FilePath $logPath -Encoding utf8
+
 # Função para registrar log
 function Escrever-Log {
     param ([string]$mensagem)
@@ -34,7 +37,7 @@ $headerLabel.Location = New-Object System.Drawing.Point(20, 10)
 $headerLabel.Size = New-Object System.Drawing.Size(560, 40)
 $headerLabel.Text = "Hcode - Execução de Passos"
 $headerLabel.Font = New-Object System.Drawing.Font("Segoe UI", 20, [System.Drawing.FontStyle]::Bold)
-$headerLabel.ForeColor = [System.Drawing.Color]::FromArgb(255, 118, 12)  # Hcode laranja (#FF760C)
+$headerLabel.ForeColor = [System.Drawing.Color]::FromArgb(255, 118, 12)  # Laranja
 $headerLabel.TextAlign = "MiddleCenter"
 $form.Controls.Add($headerLabel)
 
@@ -47,7 +50,7 @@ $statusLabel.Font = New-Object System.Drawing.Font("Segoe UI", 10)
 $statusLabel.TextAlign = "MiddleCenter"
 $form.Controls.Add($statusLabel)
 
-# Checklist para os passos
+# Checklist
 $checklist = New-Object System.Windows.Forms.CheckedListBox
 $checklist.Location = New-Object System.Drawing.Point(50, 100)
 $checklist.Size = New-Object System.Drawing.Size(500, 200)
@@ -64,7 +67,6 @@ $btnIniciar.Text = "Iniciar"
 $btnIniciar.Enabled = $false
 $btnIniciar.FlatStyle = 'Flat'
 $btnIniciar.Font = New-Object System.Drawing.Font("Segoe UI", 10, [System.Drawing.FontStyle]::Bold)
-# Cor inspirada no mascote (laranja)
 $btnIniciar.BackColor = [System.Drawing.Color]::FromArgb(255, 118, 12)
 $btnIniciar.ForeColor = [System.Drawing.Color]::White
 $form.Controls.Add($btnIniciar)
@@ -76,12 +78,11 @@ $btnReset.Size = New-Object System.Drawing.Size(150, 40)
 $btnReset.Text = "Resetar"
 $btnReset.FlatStyle = 'Flat'
 $btnReset.Font = New-Object System.Drawing.Font("Segoe UI", 10, [System.Drawing.FontStyle]::Bold)
-# Cor cinza, inspirada no mascote
 $btnReset.BackColor = [System.Drawing.Color]::FromArgb(121, 117, 108)
 $btnReset.ForeColor = [System.Drawing.Color]::White
 $form.Controls.Add($btnReset)
 
-# Função para preencher a checklist com os passos (com caixa vazia)
+# Função de reset da checklist
 function Resetar-Passos {
     $checklist.Items.Clear()
     foreach ($s in $steps) {
@@ -92,7 +93,7 @@ function Resetar-Passos {
     Escrever-Log "Interface resetada"
 }
 
-# Função para verificar se há ao menos 1 passo marcado (não concluído)
+# Verifica se há ao menos um passo marcado
 function Verificar-Marcados {
     $marcados = 0
     for ($i = 0; $i -lt $checklist.Items.Count; $i++) {
@@ -103,10 +104,10 @@ function Verificar-Marcados {
     $btnIniciar.Enabled = ($marcados -ge 1)
 }
 
-# Evento para atualização ao marcar/desmarcar
+# Evento para checar itens
 $checklist.add_ItemCheck({ Start-Sleep -Milliseconds 100; Verificar-Marcados })
 
-# Evento de clique do botão Iniciar
+# Evento botão Iniciar
 $btnIniciar.Add_Click({
         for ($i = 0; $i -lt $checklist.Items.Count; $i++) {
             if ($checklist.GetItemChecked($i) -and $checklist.Items[$i] -notmatch '^✔️') {
@@ -114,7 +115,7 @@ $btnIniciar.Add_Click({
                 $statusLabel.Text = $texto
                 $form.Refresh()
                 Escrever-Log "Executando: $texto"
-                Start-Sleep -Seconds 2  # Simulação da execução do passo
+                Start-Sleep -Seconds 2
                 $checklist.Items[$i] = "✔️ $texto"
             }
         }
@@ -123,10 +124,10 @@ $btnIniciar.Add_Click({
         $btnIniciar.Enabled = $false
     })
 
-# Evento de clique do botão Reset
+# Evento botão Reset
 $btnReset.Add_Click({ Resetar-Passos })
 
-# Inicializar a checklist
+# Inicialização
 Resetar-Passos
 
 [void]$form.ShowDialog()
