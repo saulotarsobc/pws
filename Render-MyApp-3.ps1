@@ -4,7 +4,7 @@ Add-Type -AssemblyName System.Windows.Forms
 $logPath = Join-Path -Path (Split-Path -Parent $MyInvocation.MyCommand.Definition) -ChildPath "log.txt"
 
 # Função para registrar no log
-function Escrever-Log {
+function Write-Log {
     param (
         [string]$mensagem
     )
@@ -45,7 +45,7 @@ $form.Controls.Add($startButton)
 $startButton.Add_Click({
         $startButton.Enabled = $false
         $statusLabel.Text = "Iniciando processo..."
-        Escrever-Log "Processo iniciado"
+        Write-Log "Processo iniciado"
 
         $steps = @(
             "Passo 1: Preparando ambiente...",
@@ -60,7 +60,7 @@ $startButton.Add_Click({
             $statusLabel.Text = $steps[$i]
             $form.Refresh()
 
-            Escrever-Log $steps[$i]
+            Write-Log $steps[$i]
             Start-Sleep -Seconds 2  # Simula tempo de execução
 
             # Aqui você pode colocar comandos reais
@@ -69,7 +69,7 @@ $startButton.Add_Click({
         }
 
         $statusLabel.Text = "Todos os passos foram concluídos!"
-        Escrever-Log "Processo concluído"
+        Write-Log "Processo concluído"
         $startButton.Text = "Finalizado"
     })
 
